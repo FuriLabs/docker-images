@@ -46,17 +46,11 @@ ssh-add <(echo "${INTAKE_SSH_KEY}") &> /dev/null
 # Push fingerprint (this must be changed manually)
 cat > ~/.ssh/known_hosts <<EOF
 # repo.droidian.org:22 SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u2
-repo.droidian.org ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2Eantp0qxTlzpyLwPIItOWNzIN56GYBFDzChZ2IpifKJhJJ4lRcGdrhHPr1k0yotuTm8jLakyp17oROVo1v1hRiDgEk8WZXPNc6ae+9WRPJ72IBE1aQmRZpttvK2FgHV8kt/8xKt49Z5lCuEIzngUuuUAHO1+ETCUEbaqZ/6TBEGlUEUbiT8stp+3MvTAVNswBXCLeLjZeWGRC86pCaO3FAYJg18uofrL8w3D3InpGnC6RLTods1tqw/2idojn7BOLZLij5hvxXI3StnWvBXWieJk1eHTsKtxF+VrnawMJmJvnQ2NMKKb16tbcj/tWGPjjtqbaH9l+RC6JLtL5VdkXf5UV30AYJx4KvXroqNjPvWPaPX3MJ/tgV/qt8ge8ugr3LhIswQ4o80v3C1mY7fv2Ugm2sz6F7Iw8PUplTYHQ7bNHrOThf3Pvi2eBz4KZtmYvFpbEfV1i8KK/Dt3RWXHnYsdOp4HUnF4y4duygHjkmsSdpJitQVHqa3sZI1OlSE=
+repo.droidian.org ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2/ShuoIqfJ26fouqJDG68sZeeYKFwR/GBUxadu0bUfqbsSrG37jLXz+vRei+Qeq8u0YRfe84A7v8K+yqq5pWlNDSXype35F6CJ7ts59tKWQlK7sXUYenXGbJ1PxibXlrRLxXgV/eb+GV6c8ko2vWMXmhLYnr9glKTuSmBVf94ylJUVXFvJeDsfVU4Gh92m5n4bVFxGGXAbQvAlE6foc3jHbN9BLfq08zcXCZC+xSwWeILnCSP2U1yimTagQ75+1YMWmxWarf1XFILVZARaC2U4XUuxUAAbi4uqv/z8Y9h4OoKmcWBw6yJwx856x2GdtMjsrFbz6azP7sCyHXw6KodCx7F/PWftjsiu2bfghwu7SSvMI933BDRHyC6INszlVzgUw9eQr/vMmSR/o/EsgcymwY8zxkQPCaEmhcrkI+fBgnrHxxU6hgwbsfvKNKmoFjJz1wOQ6uCWkssCvR1wJJNvnBlZYEY2Y2iJY1D9pm2QB89WJleurU6WBM3rsXt5Dk=
 # repo.droidian.org:22 SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u2
-repo.droidian.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBC3+J5H2MQXCpPNRoSBnmSz/GF706qxLlksoW3FNAsXAXp0B9WzGn8hU7hqxPTY7l00CBQZJyvzMsQ4nJHs0re0=
+repo.droidian.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBU8PvkjrCI+mtPEVYImq7Jj4hgv/57zaStBBGrkkfw2Pmx2YlVg/nASNoogPERM3SvWTLU+BJcRnuvR1T3ZjYY=
 # repo.droidian.org:22 SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u2
-repo.droidian.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKwspjJbUW6RzGVMBNank8svKFBRjl9JFn4cbhmrdCC8
-# repo.droidian.org:22 SSH-2.0-OpenSSH_7.9p1 Debian-10+deb10u2
-repo.droidian.org ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCm8IY+RFwQNIKlQDr2vRBg9zxOzGrSFiHHekwd3zdgW3k3UgW016ArFJgeS8pQ//WqJoxMnQLh42CoWqmrVSbwxyUBAPLagulIpB5vuYDSVMm8O1MWkS7+oZHD5nujQAy4zIxnN7cMSrseUzbt/vyV0dHW+WBxlPnODMDOze/vmhVUDxvsUFi+DzCn9HvSSuViLW3dEKE8po5UP2Ttalq94luru5ZxpfAeCfJ9m4dVw+VRB66c74qtKFR7UfAQVUnOLzIlUtKnG9wrZEYilCFuPFrZVFQ92sSWdPrMjWYaeC+RzwKAscgAjTQhjUeTlb+YaAO8l94zAtE5RjjOdH1t
-# repo.droidian.org:22 SSH-2.0-OpenSSH_7.9p1 Debian-10+deb10u2
-repo.droidian.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBv8R4sZtZlwV+SPHn6hQklcWAKxQu55ESjGxSmLTqqe2DSSF6zP8x0n6dd6RyA20t6Ia8s8A/gH4W7vcpKkpDs=
-# repo.droidian.org:22 SSH-2.0-OpenSSH_7.9p1 Debian-10+deb10u2
-repo.droidian.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPqtpEaUXN6HAi+FSbIWSywaPwTfgcXnDA4AKpNV+H+t
+repo.droidian.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFytZKxTLB74+kDVg5Sv8TksaSNpKL5OCscI/PQ4r237
 EOF
 
 # Determine target.
@@ -86,7 +80,7 @@ find /tmp/buildd-results/ \
 	-regextype posix-egrep \
 	-regex "/tmp/buildd-results/.*\.(u?deb|tar\..*|dsc|buildinfo)$" \
 	-print0 \
-	| xargs -0 -i rsync --perms --chmod=D770,F770 --progress {} ${INTAKE_SSH_USER}@repo.droidian.org:./${TARGET}/
+	| xargs -0 -i rsync --perms --chmod=D770,F770 --progress {} ${INTAKE_SSH_USER}@repo.furilabs.com:./${TARGET}/
 
 echo "Uploading .changes"
 find /tmp/buildd-results/ \
@@ -94,4 +88,4 @@ find /tmp/buildd-results/ \
 	-regextype posix-egrep \
 	-regex "/tmp/buildd-results/.*\.changes$" \
 	-print0 \
-	| xargs -0 -i rsync --perms --chmod=D770,F770 --progress {} ${INTAKE_SSH_USER}@repo.droidian.org:./${TARGET}/
+	| xargs -0 -i rsync --perms --chmod=D770,F770 --progress {} ${INTAKE_SSH_USER}@repo.furilabs.com:./${TARGET}/
