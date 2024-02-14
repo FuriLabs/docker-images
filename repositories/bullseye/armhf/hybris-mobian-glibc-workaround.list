@@ -1,1 +1,0 @@
-deb [signed-by=/etc/apt/droidian-gpg.d/hybris-mobian.asc] http://hybris-mobian-releng-glibc-workaround-time64.repo.droidian.org/bullseye-ci-armhf-workaround/ bullseye main

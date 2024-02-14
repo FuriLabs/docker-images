@@ -1,1 +1,0 @@
-deb [signed-by=/etc/apt/droidian-gpg.d/mobian.asc] https://repo.mobian-project.org/ mobian main non-free
