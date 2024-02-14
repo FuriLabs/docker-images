@@ -18,8 +18,8 @@ COPY repositories/%(tag)s/%(arch)s/* /etc/apt/sources.list.d/
 # Copy apt preferences
 COPY preferences/%(tag)s/* /etc/apt/preferences.d/
 
-COPY keyrings/all/* /etc/apt/droidian-gpg.d/
-COPY keyrings/%(arch)s/* /etc/apt/droidian-gpg.d/
+COPY keyrings/all/* /etc/apt/furilabs-gpg.d/
+COPY keyrings/%(arch)s/* /etc/apt/furilabs-gpg.d/
 
 COPY common/apt.conf.d/* /etc/apt/apt.conf.d/
 

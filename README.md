@@ -1,5 +1,5 @@
-Docker images for droidian
-==========================
+Docker images for FuriOS
+========================
 
 This repository contains the required source files to build Docker images
 for various release engineering tasks (package building, hardware adaptation building, rootfs building, etc...).
@@ -22,7 +22,7 @@ The following strings are replaced:
 
 | String            | Description                            | Example (for `arm64/droidian/build-essential:trixie`) |
 |-------------------|----------------------------------------|-------------------------------------------------------------|
-| `%(target_name)s` | Sanitized slug of the full target name | `arm64_droidian_build_essential_trixie`                     |
+| `%(target_name)s` | Sanitized slug of the full target name | `arm64_furios_build_essential_trixie`                     |
 | `%(arch)s`        | Architecture                           | `arm64`                                                     |
 | `%(namespace)s`   | Docker namespace                       | `droidian`                                                  |
 | `%(template)s`    | Template name                          | `build-essential`                                           |

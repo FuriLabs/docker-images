@@ -13,19 +13,19 @@ RUN apt-get update && apt-get install --yes ca-certificates
 # Note: .dummy files used to keep the directory hierarchy in git are
 # copied too, see moby/moby#26332
 COPY repositories/trixie/all/* /etc/apt/sources.list.d/
-COPY repositories/trixie/arm64/* /etc/apt/sources.list.d/
+COPY repositories/trixie/armhf/* /etc/apt/sources.list.d/
 
 # Copy apt preferences
 COPY preferences/trixie/* /etc/apt/preferences.d/
 
-COPY keyrings/all/* /etc/apt/droidian-gpg.d/
-COPY keyrings/arm64/* /etc/apt/droidian-gpg.d/
+COPY keyrings/all/* /etc/apt/furilabs-gpg.d/
+COPY keyrings/armhf/* /etc/apt/furilabs-gpg.d/
 
 COPY common/apt.conf.d/* /etc/apt/apt.conf.d/
 
-# Copy deployer for repo.droidian.org
-COPY extra/repo-droidian-deploy.sh /usr/local/bin
-COPY extra/repo-droidian-sign.sh /usr/local/bin
+# Copy deployer for repo.furilabs.com
+COPY extra/repo-furios-deploy.sh /usr/local/bin
+COPY extra/repo-furios-sign.sh /usr/local/bin
 
 # Add secondary architectures
 RUN dpkg --add-architecture arm64 && dpkg --add-architecture armhf && dpkg --add-architecture i386

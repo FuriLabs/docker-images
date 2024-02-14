@@ -18,14 +18,14 @@ COPY repositories/%(tag)s/%(arch)s/* /etc/apt/sources.list.d/
 # Copy apt preferences
 COPY preferences/%(tag)s/* /etc/apt/preferences.d/
 
-COPY keyrings/all/* /etc/apt/droidian-gpg.d/
-COPY keyrings/%(arch)s/* /etc/apt/droidian-gpg.d/
+COPY keyrings/all/* /etc/apt/furilabs-gpg.d/
+COPY keyrings/%(arch)s/* /etc/apt/furilabs-gpg.d/
 
 COPY common/apt.conf.d/* /etc/apt/apt.conf.d/
 
-# Copy deployer for repo.droidian.org
-COPY extra/repo-droidian-deploy.sh /usr/local/bin
-COPY extra/repo-droidian-sign.sh /usr/local/bin
+# Copy deployer for repo.furilabs.org
+COPY extra/repo-furios-deploy.sh /usr/local/bin
+COPY extra/repo-furios-sign.sh /usr/local/bin
 
 # Add secondary architectures
 RUN dpkg --add-architecture arm64 && dpkg --add-architecture armhf && dpkg --add-architecture i386

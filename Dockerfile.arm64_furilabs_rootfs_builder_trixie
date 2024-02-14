@@ -13,13 +13,13 @@ RUN apt-get update && apt-get install --yes ca-certificates
 # Note: .dummy files used to keep the directory hierarchy in git are
 # copied too, see moby/moby#26332
 COPY repositories/trixie/all/* /etc/apt/sources.list.d/
-COPY repositories/trixie/armhf/* /etc/apt/sources.list.d/
+COPY repositories/trixie/arm64/* /etc/apt/sources.list.d/
 
 # Copy apt preferences
 COPY preferences/trixie/* /etc/apt/preferences.d/
 
-COPY keyrings/all/* /etc/apt/droidian-gpg.d/
-COPY keyrings/armhf/* /etc/apt/droidian-gpg.d/
+COPY keyrings/all/* /etc/apt/furilabs-gpg.d/
+COPY keyrings/arm64/* /etc/apt/furilabs-gpg.d/
 
 COPY common/apt.conf.d/* /etc/apt/apt.conf.d/
 

@@ -1,7 +1,6 @@
-# droidian docker images build definition for GitHub Actions
-# Contact: Eugenio "g7" Paolantonio <me@medesimo.eu>
+# furilabs docker images build definition for GitHub Actions
 
-name: droidian docker-images
+name: furilabs docker-images
 
 on:
   schedule:
@@ -17,8 +16,8 @@ jobs:
       matrix:
         arch: [amd64, armhf, arm64]
         template: [build-essential, rootfs-builder, aptly-intake]
-        dist: [bookworm, trixie]
-        namespace: [droidian]
+        dist: [trixie]
+        namespace: [furilabs]
         exclude:
           - template: aptly-intake
             arch: arm64
