@@ -5,5 +5,7 @@
 
 set -e
 
-echo "${GPG_STAGINGPRODUCTION_SIGNING_KEY}" | gpg --import
-exec debsign -kAE9382E7F07D8B288BC836C16210FA9A8BA0CF15 *.changes
+wget -q "${GPG_STAGINGPRODUCTION_SIGNING_KEY}"
+
+cat $(basename "${GPG_STAGINGPRODUCTION_SIGNING_KEY}") | gpg --import --batch
+exec debsign -k97E5FB897E9B94B4E3ED94966261FCC7EE607820 *.changes
