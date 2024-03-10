@@ -47,7 +47,7 @@ RUN apt-get update && apt-get install -y --allow-downgrades \
  droidian-apt-config \
  droidian-archive-keyring \
  mobian-archive-keyring && \
- rm -f /etc/apt/sources.list.d/hybris-mobian.list /etc/apt/sources.list.d/mobian.list && \
+ rm -f /etc/apt/sources.list.d/furilabs.list /etc/apt/sources.list.d/mobian.list && \
  apt-get dist-upgrade -y --allow-downgrades
 
 # Patch dpkg-perl's Patch.pm to avoid overzealous checks

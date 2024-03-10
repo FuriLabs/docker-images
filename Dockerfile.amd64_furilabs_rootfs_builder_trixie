@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y \
  droidian-apt-config \
  droidian-archive-keyring \
  mobian-archive-keyring && \
- rm -f /etc/apt/sources.list.d/hybris-mobian.list /etc/apt/sources.list.d/mobian.list && \
+ rm -f /etc/apt/sources.list.d/furilabs.list /etc/apt/sources.list.d/mobian.list && \
  apt-get update && \
  apt-get install -y \
  init \
