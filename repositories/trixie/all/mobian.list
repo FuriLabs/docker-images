@@ -1,1 +1,1 @@
-deb [signed-by=/etc/apt/furilabs-gpg.d/mobian.asc] https://repo.mobian-project.org/ trixie main non-free
+deb [signed-by=/etc/apt/furilabs-gpg.d/mobian.asc] https://mobian.furilabs.com/ trixie main non-free
