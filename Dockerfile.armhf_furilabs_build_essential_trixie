@@ -44,7 +44,7 @@ RUN apt-get update && apt-get install -y --allow-downgrades \
  mkbootimg \
  mkdtboimg \
  releng-tools \
- droidian-apt-config \
+ furios-apt-config \
  furios-archive-keyring \
  mobian-archive-keyring && \
  rm -f /etc/apt/sources.list.d/furilabs.list /etc/apt/sources.list.d/mobian.list && \
