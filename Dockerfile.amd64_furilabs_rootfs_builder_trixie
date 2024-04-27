@@ -26,7 +26,7 @@ COPY common/apt.conf.d/* /etc/apt/apt.conf.d/
 # Update and install
 RUN apt-get update && apt-get install -y \
  droidian-apt-config \
- droidian-archive-keyring \
+ furios-archive-keyring \
  mobian-archive-keyring && \
  rm -f /etc/apt/sources.list.d/furilabs.list /etc/apt/sources.list.d/mobian.list && \
  apt-get update && \
