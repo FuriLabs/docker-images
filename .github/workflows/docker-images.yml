@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        arch: [amd64, armhf, arm64]
+        arch: [amd64, arm64]
         template: [build-essential, rootfs-builder, aptly-intake]
         dist: [trixie]
         namespace: [furilabs]
