@@ -45,9 +45,8 @@ RUN apt-get update && apt-get install -y --allow-downgrades \
  mkdtboimg \
  releng-tools \
  furios-apt-config \
- furios-archive-keyring \
- mobian-archive-keyring && \
- rm -f /etc/apt/sources.list.d/furilabs.list /etc/apt/sources.list.d/mobian.list && \
+ furios-archive-keyring && \
+ rm -f /etc/apt/sources.list.d/furilabs.list && \
  apt-get dist-upgrade -y --allow-downgrades
 
 # Patch dpkg-perl's Patch.pm to avoid overzealous checks
