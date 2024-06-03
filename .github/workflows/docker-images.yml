@@ -4,7 +4,7 @@ name: furilabs docker-images
 
 on:
   schedule:
-    - cron: "59 23 * * *"
+    - cron: "59 23 */14 * *"
   push:
 
 jobs:
