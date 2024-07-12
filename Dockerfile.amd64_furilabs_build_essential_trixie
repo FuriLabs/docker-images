@@ -45,6 +45,7 @@ RUN apt-get update && apt-get install -y --allow-downgrades \
  mkdtboimg \
  releng-tools \
  furios-apt-config \
+ furios-apt-config-debian-staging \
  furios-archive-keyring && \
  rm -f /etc/apt/sources.list.d/furilabs.list && \
  apt-get dist-upgrade -y --allow-downgrades

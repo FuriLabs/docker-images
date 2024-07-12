@@ -26,6 +26,7 @@ COPY common/apt.conf.d/* /etc/apt/apt.conf.d/
 # Update and install
 RUN apt-get update && apt-get install -y \
  furios-apt-config \
+ furios-apt-config-debian-staging \
  furios-archive-keyring && \
  rm -f /etc/apt/sources.list.d/furilabs.list && \
  apt-get update && \
