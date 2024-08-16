@@ -56,6 +56,3 @@ RUN \
 		"s|error(g_('diff %%s modifies file %%s through a symlink: %%s')|warning(g_('diff %%s modifies file %%s through a symlink: %%s')|" \
 		/usr/share/perl5/Dpkg/Source/Patch.pm && \
 	echo "libdpkg-perl hold" | dpkg --set-selections
-
-# get rid of t64 pins for CI
-RUN rm -f /etc/apt/preferences.d/20-debian-sid
