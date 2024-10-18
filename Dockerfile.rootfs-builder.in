@@ -1,59 +1,79 @@
 # Pull latest Debian %(tag)s
 ARG ARCH=
-FROM ${ARCH}/debian:%(tag)s
+FROM ${ARCH}/debian:%(tag)s AS builder
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV DEBCONF_NOWARNINGS yes
 ENV DEBIAN_PRIORITY critical
 
+# Install debootstrap
+RUN apt-get update && apt-get install -y debootstrap
+
+# Run debootstrap
+ARG MIRROR=http://debian.furios.io/
+RUN debootstrap --arch=${ARCH} %(tag)s /rootfs $MIRROR
+
+# Add custom apt configuration
+RUN echo 'Acquire::Check-Valid-Until false;' > /rootfs/etc/apt/apt.conf.d/10custom-settings && \
+    echo 'Acquire::https::Verify-Peer false;' >> /rootfs/etc/apt/apt.conf.d/10custom-settings && \
+    echo 'Acquire::Check-Date false;' >> /rootfs/etc/apt/apt.conf.d/10custom-settings
+
 # Required for https repositories
-RUN apt-get update && apt-get install --yes ca-certificates
+RUN chroot /rootfs apt-get update && \
+    chroot /rootfs apt-get install --yes ca-certificates adduser
 
 # Copy relevant repositories and keyrings
 # Note: .dummy files used to keep the directory hierarchy in git are
 # copied too, see moby/moby#26332
-COPY repositories/%(tag)s/all/* /etc/apt/sources.list.d/
-COPY repositories/%(tag)s/%(arch)s/* /etc/apt/sources.list.d/
+COPY repositories/%(tag)s/all/* /rootfs/etc/apt/sources.list.d/
+COPY repositories/%(tag)s/%(arch)s/* /rootfs/etc/apt/sources.list.d/
 
 # Copy apt preferences
-COPY preferences/%(tag)s/* /etc/apt/preferences.d/
+COPY preferences/%(tag)s/* /rootfs/etc/apt/preferences.d/
 
-COPY keyrings/all/* /etc/apt/furilabs-gpg.d/
-COPY keyrings/%(arch)s/* /etc/apt/furilabs-gpg.d/
+COPY keyrings/all/* /rootfs/etc/apt/furilabs-gpg.d/
+COPY keyrings/%(arch)s/* /rootfs/etc/apt/furilabs-gpg.d/
 
-COPY common/apt.conf.d/* /etc/apt/apt.conf.d/
+COPY common/apt.conf.d/* /rootfs/etc/apt/apt.conf.d/
 
 # Update and install
-RUN apt-get update && apt-get install -y \
- furios-apt-config \
- furios-apt-config-debian-staging \
- furios-archive-keyring && \
- rm -f /etc/apt/sources.list.d/furilabs.list && \
- apt-get update && \
- apt-get install -y \
- init \
- systemd-sysv \
- debos \
- dpkg-dev \
- parted \
- dosfstools \
- udev \
- bmap-tools \
- rsync \
- zip \
- lvm2 \
- qemu-user-static \
- binfmt-support \
- android-sdk-libsparse-utils \
- python3-yaml \
- systemd-container
+RUN chroot /rootfs apt-get update && chroot /rootfs apt-get install -y \
+    furios-apt-config \
+    furios-apt-config-debian-staging \
+    furios-archive-keyring && \
+    chroot /rootfs rm -f /etc/apt/sources.list.d/furilabs.list && \
+    chroot /rootfs rm -f /etc/apt/sources.list && \
+    chroot /rootfs apt-get update && \
+    chroot /rootfs apt-get install -y \
+    init \
+    systemd-sysv \
+    debos \
+    dpkg-dev \
+    parted \
+    dosfstools \
+    udev \
+    bmap-tools \
+    rsync \
+    zip \
+    lvm2 \
+    qemu-user-static \
+    binfmt-support \
+    android-sdk-libsparse-utils \
+    python3-yaml \
+    systemd-container
 
 # Workaround binfmt bug on latest qemu
-RUN \
- for x in /usr/lib/binfmt.d/qemu-*; do \
-     /bin/bash -c "[[ ${x} == *.conf ]]" || mv ${x} ${x}.conf; \
- done; \
- update-binfmts --enable
+RUN chroot /rootfs /bin/bash -c '\
+    for x in /usr/lib/binfmt.d/qemu-*; do \
+        [[ ${x} == *.conf ]] || mv ${x} ${x}.conf; \
+    done; \
+    update-binfmts --enable'
+
+# Start fresh with the debootstrapped system
+FROM scratch
+COPY --from=builder /rootfs /
+
+WORKDIR /
 
 # Systemd configuration:
 # Credits to Alexander Haase <ahaase@alexhaase.de>

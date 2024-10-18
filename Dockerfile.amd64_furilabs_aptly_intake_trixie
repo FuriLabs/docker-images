@@ -1,50 +1,70 @@
 # Pull latest Debian trixie
 ARG ARCH=
-FROM ${ARCH}/debian:trixie
+FROM ${ARCH}/debian:trixie AS builder
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV DEBCONF_NOWARNINGS yes
 ENV DEBIAN_PRIORITY critical
 
-# Required for https repositories and to properly add users
-RUN apt-get update && apt-get install --yes ca-certificates adduser
+# Install debootstrap
+RUN apt-get update && apt-get install -y debootstrap
+
+# Run debootstrap
+ARG MIRROR=http://debian.furios.io/
+RUN debootstrap --arch=amd64 trixie /rootfs $MIRROR
+
+# Add custom apt configuration
+RUN echo 'Acquire::Check-Valid-Until false;' > /rootfs/etc/apt/apt.conf.d/10custom-settings && \
+    echo 'Acquire::https::Verify-Peer false;' >> /rootfs/etc/apt/apt.conf.d/10custom-settings && \
+    echo 'Acquire::Check-Date false;' >> /rootfs/etc/apt/apt.conf.d/10custom-settings
+
+# Required for https repositories
+RUN chroot /rootfs apt-get update && \
+    chroot /rootfs apt-get install --yes ca-certificates adduser
 
 # Copy relevant repositories and keyrings
 # Note: .dummy files used to keep the directory hierarchy in git are
 # copied too, see moby/moby#26332
-COPY repositories/trixie/all/* /etc/apt/sources.list.d/
-COPY repositories/trixie/amd64/* /etc/apt/sources.list.d/
+COPY repositories/trixie/all/* /rootfs/etc/apt/sources.list.d/
+COPY repositories/trixie/amd64/* /rootfs/etc/apt/sources.list.d/
 
 # Copy apt preferences
-COPY preferences/trixie/* /etc/apt/preferences.d/
+COPY preferences/trixie/* /rootfs/etc/apt/preferences.d/
 
-COPY keyrings/all/* /etc/apt/furilabs-gpg.d/
-COPY keyrings/amd64/* /etc/apt/furilabs-gpg.d/
+COPY keyrings/all/* /rootfs/etc/apt/furilabs-gpg.d/
+COPY keyrings/amd64/* /rootfs/etc/apt/furilabs-gpg.d/
 
-COPY common/apt.conf.d/* /etc/apt/apt.conf.d/
+COPY common/apt.conf.d/* /rootfs/etc/apt/apt.conf.d/
 
 # Pre-create users and groups. We are going to remap them anyway
 # at runtime by looking at permissions of the bind-mounted directories
 # but at least we already know which ids to change
-RUN adduser --system --home /var/lib/aptly-api --no-create-home --uid 10100 aptly-api && \
- addgroup --gid 10100 aptly-api && \
- adduser aptly-api aptly-api && \
- adduser --system --home /srv/aptly-queue --no-create-home --uid 10101 aptly-queue && \
- addgroup --gid 10101 aptly-queue && \
- adduser aptly-queue aptly-queue && \
- adduser aptly-api aptly-queue
+RUN chroot /rootfs /bin/bash -c '\
+    adduser --system --home /var/lib/aptly-api --no-create-home --uid 10100 aptly-api && \
+    addgroup --gid 10100 aptly-api && \
+    adduser aptly-api aptly-api && \
+    adduser --system --home /srv/aptly-queue --no-create-home --uid 10101 aptly-queue && \
+    addgroup --gid 10101 aptly-queue && \
+    adduser aptly-queue aptly-queue && \
+    adduser aptly-api aptly-queue'
 
 # Update and install
-RUN apt-get update && apt-get install -y \
- systemd \
- systemd-sysv \
- aptly \
- aptly-api \
- python3 \
- python3-requests \
- python3-debian \
- wget \
- aptly-intake
+RUN chroot /rootfs apt-get update && chroot /rootfs apt-get install -y \
+    systemd \
+    systemd-sysv \
+    aptly \
+    aptly-api \
+    python3 \
+    python3-requests \
+    python3-debian \
+    wget \
+    aptly-intake
+
+# Start fresh with the debootstrapped system
+FROM scratch
+COPY --from=builder /rootfs /
+
+WORKDIR /
 
 # Systemd configuration:
 # Credits to Alexander Haase <ahaase@alexhaase.de>

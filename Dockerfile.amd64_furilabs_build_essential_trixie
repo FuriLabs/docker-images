@@ -1,61 +1,88 @@
 # Pull latest Debian trixie
 ARG ARCH=
-FROM ${ARCH}/debian:trixie
+FROM ${ARCH}/debian:trixie AS builder
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV DEBCONF_NOWARNINGS yes
 ENV DEBIAN_PRIORITY critical
 
+# Install debootstrap
+RUN apt-get update && apt-get install -y debootstrap
+
+# Run debootstrap
+ARG MIRROR=http://debian.furios.io/
+RUN debootstrap --arch=amd64 trixie /rootfs $MIRROR
+
+# Add custom apt configuration
+RUN echo 'Acquire::Check-Valid-Until false;' > /rootfs/etc/apt/apt.conf.d/10custom-settings && \
+    echo 'Acquire::https::Verify-Peer false;' >> /rootfs/etc/apt/apt.conf.d/10custom-settings && \
+    echo 'Acquire::Check-Date false;' >> /rootfs/etc/apt/apt.conf.d/10custom-settings
+
 # Required for https repositories
-RUN apt-get update && apt-get install --yes ca-certificates
+RUN chroot /rootfs apt-get update && \
+    chroot /rootfs apt-get install --yes ca-certificates adduser
 
 # Copy relevant repositories and keyrings
 # Note: .dummy files used to keep the directory hierarchy in git are
 # copied too, see moby/moby#26332
-COPY repositories/trixie/all/* /etc/apt/sources.list.d/
-COPY repositories/trixie/amd64/* /etc/apt/sources.list.d/
+COPY repositories/trixie/all/* /rootfs/etc/apt/sources.list.d/
+COPY repositories/trixie/amd64/* /rootfs/etc/apt/sources.list.d/
 
 # Copy apt preferences
-COPY preferences/trixie/* /etc/apt/preferences.d/
+COPY preferences/trixie/* /rootfs/etc/apt/preferences.d/
 
-COPY keyrings/all/* /etc/apt/furilabs-gpg.d/
-COPY keyrings/amd64/* /etc/apt/furilabs-gpg.d/
-
-COPY common/apt.conf.d/* /etc/apt/apt.conf.d/
+COPY keyrings/all/* /rootfs/etc/apt/furilabs-gpg.d/
+COPY keyrings/amd64/* /rootfs/etc/apt/furilabs-gpg.d/
 
 # Copy deployer for repo.furilabs.com
-COPY extra/repo-furios-deploy.sh /usr/local/bin
-COPY extra/repo-furios-sign.sh /usr/local/bin
+COPY extra/repo-furios-deploy.sh /rootfs/usr/local/bin
+COPY extra/repo-furios-sign.sh /rootfs/usr/local/bin
+
+COPY common/apt.conf.d/* /rootfs/etc/apt/apt.conf.d/
 
 # Add secondary architectures
-RUN dpkg --add-architecture arm64 && dpkg --add-architecture armhf && dpkg --add-architecture i386
+RUN chroot /rootfs dpkg --add-architecture arm64 && \
+    chroot /rootfs dpkg --add-architecture armhf && \
+    chroot /rootfs dpkg --add-architecture i386
 
 # Update and install
-RUN apt-get update && apt-get install -y --allow-downgrades \
- build-essential \
- libncurses-dev \
- bash-completion \
- nano \
- devscripts \
- equivs \
- wget \
- openssh-client \
- rsync \
- mkbootimg \
- mkdtboimg \
- releng-tools \
- furios-apt-config \
- furios-apt-config-debian-staging \
- furios-archive-keyring && \
- rm -f /etc/apt/sources.list.d/furilabs.list && \
- apt-get dist-upgrade -y --allow-downgrades
+RUN chroot /rootfs apt-get update && chroot /rootfs apt-get install -y --allow-downgrades \
+    build-essential \
+    libncurses-dev \
+    bash-completion \
+    nano \
+    devscripts \
+    equivs \
+    wget \
+    openssh-client \
+    rsync \
+    mkbootimg \
+    mkdtboimg \
+    releng-tools \
+    furios-apt-config \
+    furios-apt-config-debian-staging \
+    furios-archive-keyring \
+    runonce && \
+    chroot /rootfs rm -f /etc/apt/sources.list.d/furilabs.list && \
+    chroot /rootfs rm -f /etc/apt/sources.list
 
 # Patch dpkg-perl's Patch.pm to avoid overzealous checks
-RUN \
-	sed -i \
-		"s|error(g_('diff %s modifies file %s through a symlink: %s')|warning(g_('diff %s modifies file %s through a symlink: %s')|" \
-		/usr/share/perl5/Dpkg/Source/Patch.pm && \
-	echo "libdpkg-perl hold" | dpkg --set-selections
+RUN chroot /rootfs /bin/bash <<EOF
+perl -i -pe '
+BEGIN { \$modified = 0; }
+if (/error\(g_\('\''diff %s modifies file %s through a symlink: %s'\''\)/ && !\$modified) {
+    s/error/warning/;
+    \$modified = 1;
+}
+' /usr/share/perl5/Dpkg/Source/Patch.pm
+echo "libdpkg-perl hold" | dpkg --set-selections
+EOF
 
 # get rid of gst plugins bad apt repo
-RUN rm -f /etc/apt/sources.list.d/gst.list
+RUN chroot /rootfs rm -f /etc/apt/sources.list.d/gst.list
+
+# Start fresh with the debootstrapped system
+FROM scratch
+COPY --from=builder /rootfs /
+
+WORKDIR /

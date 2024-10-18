@@ -1,61 +1,88 @@
 # Pull latest Debian %(tag)s
 ARG ARCH=
-FROM ${ARCH}/debian:%(tag)s
+FROM ${ARCH}/debian:%(tag)s AS builder
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV DEBCONF_NOWARNINGS yes
 ENV DEBIAN_PRIORITY critical
 
+# Install debootstrap
+RUN apt-get update && apt-get install -y debootstrap
+
+# Run debootstrap
+ARG MIRROR=http://debian.furios.io/
+RUN debootstrap --arch=${ARCH} %(tag)s /rootfs $MIRROR
+
+# Add custom apt configuration
+RUN echo 'Acquire::Check-Valid-Until false;' > /rootfs/etc/apt/apt.conf.d/10custom-settings && \
+    echo 'Acquire::https::Verify-Peer false;' >> /rootfs/etc/apt/apt.conf.d/10custom-settings && \
+    echo 'Acquire::Check-Date false;' >> /rootfs/etc/apt/apt.conf.d/10custom-settings
+
 # Required for https repositories
-RUN apt-get update && apt-get install --yes ca-certificates
+RUN chroot /rootfs apt-get update && \
+    chroot /rootfs apt-get install --yes ca-certificates adduser
 
 # Copy relevant repositories and keyrings
 # Note: .dummy files used to keep the directory hierarchy in git are
 # copied too, see moby/moby#26332
-COPY repositories/%(tag)s/all/* /etc/apt/sources.list.d/
-COPY repositories/%(tag)s/%(arch)s/* /etc/apt/sources.list.d/
+COPY repositories/%(tag)s/all/* /rootfs/etc/apt/sources.list.d/
+COPY repositories/%(tag)s/%(arch)s/* /rootfs/etc/apt/sources.list.d/
 
 # Copy apt preferences
-COPY preferences/%(tag)s/* /etc/apt/preferences.d/
+COPY preferences/%(tag)s/* /rootfs/etc/apt/preferences.d/
 
-COPY keyrings/all/* /etc/apt/furilabs-gpg.d/
-COPY keyrings/%(arch)s/* /etc/apt/furilabs-gpg.d/
+COPY keyrings/all/* /rootfs/etc/apt/furilabs-gpg.d/
+COPY keyrings/%(arch)s/* /rootfs/etc/apt/furilabs-gpg.d/
 
-COPY common/apt.conf.d/* /etc/apt/apt.conf.d/
+COPY common/apt.conf.d/* /rootfs/etc/apt/apt.conf.d/
 
 # Copy deployer for repo.furilabs.org
-COPY extra/repo-furios-deploy.sh /usr/local/bin
-COPY extra/repo-furios-sign.sh /usr/local/bin
+COPY extra/repo-furios-deploy.sh /rootfs/usr/local/bin
+COPY extra/repo-furios-sign.sh /rootfs/usr/local/bin
 
 # Add secondary architectures
-RUN dpkg --add-architecture arm64 && dpkg --add-architecture armhf && dpkg --add-architecture i386
+RUN chroot /rootfs dpkg --add-architecture arm64 && \
+    chroot /rootfs dpkg --add-architecture armhf && \
+    chroot /rootfs dpkg --add-architecture i386
 
 # Update and install
-RUN apt-get update && apt-get install -y --allow-downgrades \
- build-essential \
- libncurses-dev \
- bash-completion \
- nano \
- devscripts \
- equivs \
- wget \
- openssh-client \
- rsync \
- mkbootimg \
- mkdtboimg \
- releng-tools \
- furios-apt-config \
- furios-apt-config-debian-staging \
- furios-archive-keyring && \
- rm -f /etc/apt/sources.list.d/furilabs.list && \
- apt-get dist-upgrade -y --allow-downgrades
+RUN chroot /rootfs apt-get update && chroot /rootfs apt-get install -y --allow-downgrades \
+    build-essential \
+    libncurses-dev \
+    bash-completion \
+    nano \
+    devscripts \
+    equivs \
+    wget \
+    openssh-client \
+    rsync \
+    mkbootimg \
+    mkdtboimg \
+    releng-tools \
+    furios-apt-config \
+    furios-apt-config-debian-staging \
+    furios-archive-keyring \
+    runonce && \
+    chroot /rootfs rm -f /etc/apt/sources.list.d/furilabs.list && \
+    chroot /rootfs rm -f /etc/apt/sources.list
 
 # Patch dpkg-perl's Patch.pm to avoid overzealous checks
-RUN \
-	sed -i \
-		"s|error(g_('diff %%s modifies file %%s through a symlink: %%s')|warning(g_('diff %%s modifies file %%s through a symlink: %%s')|" \
-		/usr/share/perl5/Dpkg/Source/Patch.pm && \
-	echo "libdpkg-perl hold" | dpkg --set-selections
+RUN chroot /rootfs /bin/bash <<EOF
+perl -i -pe '
+BEGIN { \$modified = 0; }
+if (/error\(g_\('\''diff %s modifies file %s through a symlink: %s'\''\)/ && !\$modified) {
+    s/error/warning/;
+    \$modified = 1;
+}
+' /usr/share/perl5/Dpkg/Source/Patch.pm
+echo "libdpkg-perl hold" | dpkg --set-selections
+EOF
 
 # get rid of gst plugins bad apt repo
-RUN rm -f /etc/apt/sources.list.d/gst.list
+RUN chroot /rootfs rm -f /etc/apt/sources.list.d/gst.list
+
+# Start fresh with the debootstrapped system
+FROM scratch
+COPY --from=builder /rootfs /
+
+WORKDIR /
