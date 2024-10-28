@@ -58,7 +58,6 @@ RUN chroot /rootfs apt-get update && chroot /rootfs apt-get install -y --allow-d
     mkdtboimg \
     releng-tools \
     furios-apt-config \
-    furios-apt-config-debian-staging \
     furios-apt-config-krypton \
     furios-archive-keyring \
     runonce && \

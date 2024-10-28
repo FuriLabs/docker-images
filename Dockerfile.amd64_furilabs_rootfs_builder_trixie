@@ -39,7 +39,6 @@ COPY common/apt.conf.d/* /rootfs/etc/apt/apt.conf.d/
 # Update and install
 RUN chroot /rootfs apt-get update && chroot /rootfs apt-get install -y \
     furios-apt-config \
-    furios-apt-config-debian-staging \
     furios-archive-keyring && \
     chroot /rootfs rm -f /etc/apt/sources.list.d/furilabs.list && \
     chroot /rootfs rm -f /etc/apt/sources.list && \
