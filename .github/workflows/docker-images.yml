@@ -10,33 +10,48 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
-
     strategy:
       fail-fast: true
       matrix:
-        arch: [amd64, arm64]
-        template: [build-essential, rootfs-builder, aptly-intake]
-        dist: [trixie]
-        namespace: [furilabs]
-        exclude:
-          - template: aptly-intake
-            arch: arm64
-          - template: aptly-intake
-            arch: armhf
+        include:
+          # AMD64 builds
+          - arch: amd64
+            runner: ubuntu-24.04
+            template: build-essential
+            dist: trixie
+            namespace: furilabs
+          - arch: amd64
+            runner: ubuntu-24.04
+            template: rootfs-builder
+            dist: trixie
+            namespace: furilabs
+          - arch: amd64
+            runner: ubuntu-24.04
+            template: aptly-intake
+            dist: trixie
+            namespace: furilabs
 
+          # ARM64 builds
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+            template: build-essential
+            dist: trixie
+            namespace: furilabs
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+            template: rootfs-builder
+            dist: trixie
+            namespace: furilabs
+
+    runs-on: ${{ matrix.runner }}
     name: ${{ matrix.template }}:${{ matrix.dist }} on ${{ matrix.arch }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: QEMU set-up
-        uses: docker/setup-qemu-action@v1
-
       - name: Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
         with:
           install: true
 
