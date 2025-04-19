@@ -58,7 +58,10 @@ RUN chroot /rootfs apt-get update && chroot /rootfs apt-get install -y \
     python3-requests \
     python3-debian \
     wget \
-    aptly-intake
+    aptly-intake \
+    uuid-runtime \
+    sudo \
+    nano
 
 # Start fresh with the debootstrapped system
 FROM scratch
