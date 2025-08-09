@@ -1,0 +1,107 @@
+# Pull latest Debian forky
+ARG ARCH=
+FROM ${ARCH}/debian:forky AS builder
+
+ENV DEBIAN_FRONTEND noninteractive
+ENV DEBCONF_NOWARNINGS yes
+ENV DEBIAN_PRIORITY critical
+
+# Install debootstrap
+RUN apt-get update && apt-get install -y debootstrap
+
+# Run debootstrap
+ARG MIRROR=http://debian.furios.io/
+RUN debootstrap --arch=arm64 forky /rootfs $MIRROR
+
+# Add custom apt configuration
+RUN echo 'Acquire::Check-Valid-Until false;' > /rootfs/etc/apt/apt.conf.d/10custom-settings && \
+    echo 'Acquire::https::Verify-Peer false;' >> /rootfs/etc/apt/apt.conf.d/10custom-settings && \
+    echo 'Acquire::Check-Date false;' >> /rootfs/etc/apt/apt.conf.d/10custom-settings
+
+# Required for https repositories
+RUN chroot /rootfs apt-get update && \
+    chroot /rootfs apt-get install --yes ca-certificates adduser
+
+# Copy relevant repositories and keyrings
+# Note: .dummy files used to keep the directory hierarchy in git are
+# copied too, see moby/moby#26332
+COPY repositories/forky/all/* /rootfs/etc/apt/sources.list.d/
+COPY repositories/forky/arm64/* /rootfs/etc/apt/sources.list.d/
+
+# Copy apt preferences
+COPY preferences/forky/* /rootfs/etc/apt/preferences.d/
+
+COPY keyrings/all/* /rootfs/etc/apt/furilabs-gpg.d/
+COPY keyrings/arm64/* /rootfs/etc/apt/furilabs-gpg.d/
+
+COPY common/apt.conf.d/* /rootfs/etc/apt/apt.conf.d/
+
+# Update and install
+RUN chroot /rootfs apt-get update && chroot /rootfs apt-get install -y \
+    furios-apt-config \
+    furios-archive-keyring && \
+    chroot /rootfs rm -f /etc/apt/sources.list.d/furilabs.list && \
+    chroot /rootfs rm -f /etc/apt/sources.list && \
+    chroot /rootfs apt-get update && \
+    chroot /rootfs apt-get install -y \
+    init \
+    systemd-sysv \
+    debos \
+    dpkg-dev \
+    parted \
+    dosfstools \
+    udev \
+    bmap-tools \
+    rsync \
+    zip \
+    lvm2 \
+    qemu-user-static \
+    binfmt-support \
+    android-sdk-libsparse-utils \
+    python3-yaml \
+    systemd-container
+
+# Workaround binfmt bug on latest qemu
+RUN chroot /rootfs /bin/bash -c '\
+ for x in /usr/lib/binfmt.d/qemu-*; do \
+     [[ ${x} == *.conf ]] || mv ${x} ${x}.conf; \
+ done; \
+ update-binfmts --enable'
+
+# Start fresh with the debootstrapped system
+FROM scratch
+COPY --from=builder /rootfs /
+
+WORKDIR /
+
+# Systemd configuration:
+# Credits to Alexander Haase <ahaase@alexhaase.de>
+#
+# https://github.com/alehaa/docker-debian-systemd
+
+# Configure systemd.
+#
+# For running systemd inside a Docker container, some additional tweaks are
+# required. Some of them have already been applied above.
+#
+# The 'container' environment variable tells systemd that it's running inside a
+# Docker container environment.
+ENV container docker
+
+# A different stop signal is required, so systemd will initiate a shutdown when
+# running 'docker stop <container>'.
+STOPSIGNAL SIGRTMIN+3
+
+# The host's cgroup filesystem need's to be mounted (read-only) in the
+# container. '/run', '/run/lock' and '/tmp' need to be tmpfs filesystems when
+# running the container without 'CAP_SYS_ADMIN'.
+#
+# NOTE: For running Debian stretch, 'CAP_SYS_ADMIN' still needs to be added, as
+#       stretch's version of systemd is not recent enough. Buster will run just
+#       fine without 'CAP_SYS_ADMIN'.
+VOLUME [ "/sys/fs/cgroup", "/run", "/run/lock", "/tmp" ]
+
+# As this image should run systemd, the default command will be changed to start
+# the init system. CMD will be preferred in favor of ENTRYPOINT, so one may
+# override it when creating the container to e.g. to run a bash console instead.
+CMD [ "/sbin/init" ]
