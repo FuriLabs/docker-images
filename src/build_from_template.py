@@ -8,8 +8,8 @@ import os
 from collections import namedtuple
 
 YAML_FILE = "./.github/workflows/docker-images.yml"
-DOCKERFILE_PATH = "./Dockerfile.%s.in"
-DOCKERFILE_TARGET = "./Dockerfile.%(target_name)s"
+DOCKERFILE_PATH = "./Dockerfiles/Dockerfile.%s.in"
+DOCKERFILE_TARGET = "./Dockerfiles/Dockerfile.%(target_name)s"
 
 
 if __name__ != "__main__":
