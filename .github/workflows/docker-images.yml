@@ -63,6 +63,11 @@ jobs:
             template: rootfs-builder
             dist: trixie
             namespace: furilabs
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+            template: aptly-intake
+            dist: trixie
+            namespace: furilabs
 
           # Forky
           - arch: arm64
@@ -73,6 +78,11 @@ jobs:
           - arch: arm64
             runner: ubuntu-24.04-arm
             template: rootfs-builder
+            dist: forky
+            namespace: furilabs
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+            template: aptly-intake
             dist: forky
             namespace: furilabs
 
