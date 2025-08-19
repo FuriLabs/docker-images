@@ -15,6 +15,8 @@ jobs:
       matrix:
         include:
           # AMD64 builds
+
+          # Trixie
           - arch: amd64
             runner: ubuntu-24.04
             template: build-essential
@@ -31,7 +33,26 @@ jobs:
             dist: trixie
             namespace: furilabs
 
+          # Forky
+          - arch: amd64
+            runner: ubuntu-24.04
+            template: build-essential
+            dist: forky
+            namespace: furilabs
+          - arch: amd64
+            runner: ubuntu-24.04
+            template: rootfs-builder
+            dist: forky
+            namespace: furilabs
+          - arch: amd64
+            runner: ubuntu-24.04
+            template: aptly-intake
+            dist: forky
+            namespace: furilabs
+
           # ARM64 builds
+
+          # Trixie
           - arch: arm64
             runner: ubuntu-24.04-arm
             template: build-essential
@@ -41,6 +62,18 @@ jobs:
             runner: ubuntu-24.04-arm
             template: rootfs-builder
             dist: trixie
+            namespace: furilabs
+
+          # Forky
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+            template: build-essential
+            dist: forky
+            namespace: furilabs
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+            template: rootfs-builder
+            dist: forky
             namespace: furilabs
 
     runs-on: ${{ matrix.runner }}
