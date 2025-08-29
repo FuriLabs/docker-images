@@ -77,7 +77,7 @@ echo "libdpkg-perl hold" | dpkg --set-selections
 EOF
 
 # get rid of gst plugins bad apt repo
-RUN chroot /rootfs rm -f /etc/apt/sources.list.d/gst.list
+RUN chroot /rootfs rm -f /etc/apt/sources.list.d/gst.sources
 
 # Start fresh with the debootstrapped system
 FROM scratch
