@@ -26,7 +26,6 @@ RUN chroot /rootfs apt-get update && \
 # Note: .dummy files used to keep the directory hierarchy in git are
 # copied too, see moby/moby#26332
 COPY repositories/forky/all/* /rootfs/etc/apt/sources.list.d/
-COPY repositories/trixie/all/* /rootfs/etc/apt/sources.list.d/
 COPY repositories/forky/arm64/* /rootfs/etc/apt/sources.list.d/
 
 # Copy apt preferences
