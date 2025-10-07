@@ -41,7 +41,7 @@ COPY extra/repo-furios-sign.sh /rootfs/usr/local/bin
 COPY common/apt.conf.d/* /rootfs/etc/apt/apt.conf.d/
 
 # Add secondary architectures
-RUN chroot /rootfs dpkg --add-architecture arm64 && chroot /rootfs dpkg --add-architecture armhf && chroot /rootfs dpkg --add-architecture i386
+RUN chroot /rootfs dpkg --add-architecture arm64
 
 # Update and install
 RUN chroot /rootfs apt-get update && chroot /rootfs apt-get install -y --allow-downgrades \
