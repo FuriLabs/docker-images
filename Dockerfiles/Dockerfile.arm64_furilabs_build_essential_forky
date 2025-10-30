@@ -21,8 +21,8 @@ RUN echo 'Acquire::Check-Valid-Until false;' > /rootfs/etc/apt/apt.conf.d/10cust
     echo 'Acquire::Check-Date false;' >> /rootfs/etc/apt/apt.conf.d/10custom-settings
 
 # Required for https repositories
-RUN chroot /rootfs apt-get update && \
-    chroot /rootfs apt-get install --yes ca-certificates adduser
+RUN chroot /rootfs apt-get update
+RUN chroot /rootfs apt-get install --yes ca-certificates adduser
 
 # Copy relevant repositories and keyrings
 # Note: .dummy files used to keep the directory hierarchy in git are
@@ -46,7 +46,8 @@ COPY common/apt.conf.d/* /rootfs/etc/apt/apt.conf.d/
 RUN chroot /rootfs dpkg --add-architecture arm64
 
 # Update and install
-RUN chroot /rootfs apt-get update && chroot /rootfs apt-get install -y --allow-downgrades \
+RUN chroot /rootfs apt-get update 
+RUN chroot /rootfs apt-get install -y --allow-downgrades \
     build-essential \
     libncurses-dev \
     bash-completion \
@@ -62,9 +63,9 @@ RUN chroot /rootfs apt-get update && chroot /rootfs apt-get install -y --allow-d
     furios-apt-config \
     furios-apt-config-krypton \
     furios-archive-keyring \
-    runonce && \
-    chroot /rootfs rm -f /etc/apt/sources.list.d/furilabs.list && \
-    chroot /rootfs rm -f /etc/apt/sources.list
+    runonce
+
+RUN chroot /rootfs rm -f /etc/apt/sources.list.d/furilabs.list /etc/apt/sources.list.d/gst.sources /etc/apt/sources.list
 
 # Patch dpkg-perl's Patch.pm to avoid overzealous checks and hold libdpkg-perl
 RUN chroot /rootfs /bin/bash -c '\
@@ -78,9 +79,6 @@ RUN chroot /rootfs /bin/bash -c '\
     '"'"' /usr/share/perl5/Dpkg/Source/Patch.pm; \
     echo "libdpkg-perl hold" | dpkg --set-selections \
 '
-
-# get rid of gst plugins bad apt repo
-RUN chroot /rootfs rm -f /etc/apt/sources.list.d/gst.sources
 
 # Start fresh with the debootstrapped system
 FROM scratch

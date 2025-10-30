@@ -21,8 +21,8 @@ RUN echo 'Acquire::Check-Valid-Until false;' > /rootfs/etc/apt/apt.conf.d/10cust
     echo 'Acquire::Check-Date false;' >> /rootfs/etc/apt/apt.conf.d/10custom-settings
 
 # Required for https repositories
-RUN chroot /rootfs apt-get update && \
-    chroot /rootfs apt-get install --yes ca-certificates adduser
+RUN chroot /rootfs apt-get update
+RUN chroot /rootfs apt-get install --yes ca-certificates adduser
 
 # Copy relevant repositories and keyrings
 # Note: .dummy files used to keep the directory hierarchy in git are
@@ -51,7 +51,8 @@ RUN chroot /rootfs /bin/bash -c '\
     adduser aptly-api aptly-queue'
 
 # Update and install
-RUN chroot /rootfs apt-get update && chroot /rootfs apt-get install -y \
+RUN chroot /rootfs apt-get update
+RUN chroot /rootfs apt-get install -y \
     systemd \
     systemd-sysv \
     aptly \

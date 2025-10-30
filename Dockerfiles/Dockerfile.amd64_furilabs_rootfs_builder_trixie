@@ -21,8 +21,8 @@ RUN echo 'Acquire::Check-Valid-Until false;' > /rootfs/etc/apt/apt.conf.d/10cust
     echo 'Acquire::Check-Date false;' >> /rootfs/etc/apt/apt.conf.d/10custom-settings
 
 # Required for https repositories
-RUN chroot /rootfs apt-get update && \
-    chroot /rootfs apt-get install --yes ca-certificates adduser
+RUN chroot /rootfs apt-get update
+RUN chroot /rootfs apt-get install --yes ca-certificates adduser
 
 # Copy relevant repositories and keyrings
 # Note: .dummy files used to keep the directory hierarchy in git are
@@ -39,13 +39,15 @@ COPY keyrings/amd64/* /rootfs/etc/apt/furilabs-gpg.d/
 COPY common/apt.conf.d/* /rootfs/etc/apt/apt.conf.d/
 
 # Update and install
-RUN chroot /rootfs apt-get update && chroot /rootfs apt-get install -y \
+RUN chroot /rootfs apt-get update
+RUN chroot /rootfs apt-get install -y \
     furios-apt-config \
-    furios-archive-keyring && \
-    chroot /rootfs rm -f /etc/apt/sources.list.d/furilabs.list && \
-    chroot /rootfs rm -f /etc/apt/sources.list && \
-    chroot /rootfs apt-get update && \
-    chroot /rootfs apt-get install -y \
+    furios-archive-keyring
+
+RUN chroot /rootfs rm -f /etc/apt/sources.list.d/furilabs.list /etc/apt/sources.list
+
+RUN chroot /rootfs apt-get update
+RUN chroot /rootfs apt-get install -y \
     init \
     systemd-sysv \
     debos \
