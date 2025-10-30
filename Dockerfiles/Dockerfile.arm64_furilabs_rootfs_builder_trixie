@@ -47,6 +47,18 @@ RUN chroot /rootfs apt-get install -y \
 RUN chroot /rootfs rm -f /etc/apt/sources.list.d/furilabs.list /etc/apt/sources.list
 
 RUN chroot /rootfs apt-get update
+
+# Workaround machine-id bug in latest systemd
+RUN --security=insecure sh -c '\
+    mount --bind /proc /rootfs/proc && \
+    mount --bind /sys  /rootfs/sys  && \
+    mount --bind /dev  /rootfs/dev  && \
+    chroot /rootfs apt-get install -y init systemd-sysv udev && \
+    umount /rootfs/proc && \
+    umount /rootfs/sys  && \
+    umount /rootfs/dev  \
+'
+
 RUN chroot /rootfs apt-get install -y \
     init \
     systemd-sysv \
