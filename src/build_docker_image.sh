@@ -32,10 +32,6 @@ case "${ARCH}" in
 		_DOCKER_ARCH="arm64v8"
 		_DOCKER_PLATFORM="linux/arm64"
 		;;
-	"armhf")
-		_DOCKER_ARCH="arm32v7"
-		_DOCKER_PLATFORM="linux/arm"
-		;;
 
 	*)
 		_DOCKER_ARCH="${ARCH}"
