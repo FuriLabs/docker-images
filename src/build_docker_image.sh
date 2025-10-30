@@ -43,4 +43,14 @@ case "${ARCH}" in
 		;;
 esac
 
-docker build -f "./Dockerfiles/Dockerfile.${_sanitized}" --tag "${IMAGE}" --build-arg ARCH="${_DOCKER_ARCH}" --platform "${_DOCKER_PLATFORM}" --output type=docker .
+export DOCKER_BUILDKIT=1
+export BUILDKIT_PROGRESS=plain
+
+docker buildx build \
+    --allow security.insecure \
+    -f "./Dockerfiles/Dockerfile.${_sanitized}" \
+    --tag "${IMAGE}" \
+    --build-arg ARCH="${_DOCKER_ARCH}" \
+    --platform "${_DOCKER_PLATFORM}" \
+    --output type=docker \
+    .
