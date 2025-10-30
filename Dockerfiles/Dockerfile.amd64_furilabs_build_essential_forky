@@ -67,19 +67,6 @@ RUN chroot /rootfs apt-get install -y --allow-downgrades \
 
 RUN chroot /rootfs rm -f /etc/apt/sources.list.d/furilabs.list /etc/apt/sources.list.d/gst.sources /etc/apt/sources.list
 
-# Patch dpkg-perl's Patch.pm to avoid overzealous checks and hold libdpkg-perl
-RUN chroot /rootfs /bin/bash -c '\
-    set -euo pipefail; \
-    perl -i -pe '"'"' \
-        our $patched //= 0; \
-        if (!$patched && /error\(g_\(.\''diff %s modifies file %s through a symlink: %s\''.\)\)/) { \
-            s/error/warning/; \
-            $patched = 1; \
-        } \
-    '"'"' /usr/share/perl5/Dpkg/Source/Patch.pm; \
-    echo "libdpkg-perl hold" | dpkg --set-selections \
-'
-
 # Start fresh with the debootstrapped system
 FROM scratch
 COPY --from=builder /rootfs /
