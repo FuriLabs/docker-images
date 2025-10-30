@@ -59,6 +59,7 @@ RUN chroot /rootfs apt-get install -y \
     rsync \
     zip \
     lvm2 \
+    qemu-user-binfmt \
     binfmt-support \
     android-sdk-libsparse-utils \
     python3-yaml \
