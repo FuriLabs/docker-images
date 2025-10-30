@@ -66,17 +66,18 @@ RUN chroot /rootfs apt-get update && chroot /rootfs apt-get install -y --allow-d
     chroot /rootfs rm -f /etc/apt/sources.list.d/furilabs.list && \
     chroot /rootfs rm -f /etc/apt/sources.list
 
-# Patch dpkg-perl's Patch.pm to avoid overzealous checks
-RUN chroot /rootfs /bin/bash <<EOF
-perl -i -pe '
-BEGIN { \$modified = 0; }
-if (/error\(g_\('\''diff %s modifies file %s through a symlink: %s'\''\)/ && !\$modified) {
-    s/error/warning/;
-    \$modified = 1;
-}
-' /usr/share/perl5/Dpkg/Source/Patch.pm
-echo "libdpkg-perl hold" | dpkg --set-selections
-EOF
+# Patch dpkg-perl's Patch.pm to avoid overzealous checks and hold libdpkg-perl
+RUN chroot /rootfs /bin/bash -c '\
+    set -euo pipefail; \
+    perl -i -pe '"'"' \
+        our $patched //= 0; \
+        if (!$patched && /error\(g_\(.\''diff %s modifies file %s through a symlink: %s\''.\)\)/) { \
+            s/error/warning/; \
+            $patched = 1; \
+        } \
+    '"'"' /usr/share/perl5/Dpkg/Source/Patch.pm; \
+    echo "libdpkg-perl hold" | dpkg --set-selections \
+'
 
 # get rid of gst plugins bad apt repo
 RUN chroot /rootfs rm -f /etc/apt/sources.list.d/gst.sources
