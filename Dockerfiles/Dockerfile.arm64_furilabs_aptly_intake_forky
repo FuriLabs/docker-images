@@ -58,7 +58,7 @@ RUN --security=insecure sh -c '\
     mount --bind /proc /rootfs/proc && \
     mount --bind /sys  /rootfs/sys  && \
     mount --bind /dev  /rootfs/dev  && \
-    chroot /rootfs apt-get install -y init systemd-sysv udev && \
+    chroot /rootfs apt-get install -y init systemd-sysv udev uuid-runtime sudo && \
     umount /rootfs/proc && \
     umount /rootfs/sys  && \
     umount /rootfs/dev  \
@@ -74,8 +74,6 @@ RUN chroot /rootfs apt-get install -y \
     python3-debian \
     wget \
     aptly-intake \
-    uuid-runtime \
-    sudo \
     nano
 
 # Start fresh with the debootstrapped system
