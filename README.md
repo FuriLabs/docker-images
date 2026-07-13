@@ -17,10 +17,10 @@ where `@template@` is the template name.
 
 The following strings are replaced:
 
-| String            | Description                            | Example (for `arm64/furilabs/build-essential:trixie`) |
+| String            | Description                            | Example (for `arm64/furilabs/build-essential:forky`) |
 |-------------------|----------------------------------------|-------------------------------------------------------------|
-| `%(target_name)s` | Sanitized slug of the full target name | `arm64_furios_build_essential_trixie`                     |
+| `%(target_name)s` | Sanitized slug of the full target name | `arm64_furios_build_essential_forky`                        |
 | `%(arch)s`        | Architecture                           | `arm64`                                                     |
 | `%(namespace)s`   | Docker namespace                       | `furilabs`                                                  |
 | `%(template)s`    | Template name                          | `build-essential`                                           |
-| `%(tag)s`         | Image tag                              | `trixie`                                                    |
+| `%(tag)s`         | Image tag                              | `forky`                                                     |

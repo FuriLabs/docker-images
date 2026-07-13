@@ -1,1 +1,0 @@
-deb [signed-by=/etc/apt/furilabs-gpg.d/furilabs.asc] https://production.repo.furios.io/ trixie main
