@@ -73,7 +73,7 @@ RUN chroot /rootfs apt-get install -y --allow-downgrades \
     mkdtboimg \
     releng-tools \
     furios-apt-config \
-    furios-apt-config-krypton \
+    furios-apt-config-sync \
     furios-archive-keyring \
     runonce
 
