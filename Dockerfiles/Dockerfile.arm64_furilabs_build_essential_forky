@@ -77,7 +77,7 @@ RUN chroot /rootfs apt-get install -y --allow-downgrades \
     furios-archive-keyring \
     runonce
 
-RUN chroot /rootfs rm -f /etc/apt/sources.list.d/furilabs.list /etc/apt/sources.list.d/gst.sources /etc/apt/sources.list
+RUN chroot /rootfs rm -f /etc/apt/sources.list.d/furilabs.list /etc/apt/sources.list
 
 # Start fresh with the debootstrapped system
 FROM scratch
