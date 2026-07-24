@@ -29,12 +29,12 @@ ssh-add <(cat $(basename "${INTAKE_SSH_KEY}")) &> /dev/null
 
 # Push fingerprint (this must be changed manually)
 cat > ~/.ssh/known_hosts <<EOF
-# repo.furilabs.com:22 SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u2
-repo.furilabs.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2/ShuoIqfJ26fouqJDG68sZeeYKFwR/GBUxadu0bUfqbsSrG37jLXz+vRei+Qeq8u0YRfe84A7v8K+yqq5pWlNDSXype35F6CJ7ts59tKWQlK7sXUYenXGbJ1PxibXlrRLxXgV/eb+GV6c8ko2vWMXmhLYnr9glKTuSmBVf94ylJUVXFvJeDsfVU4Gh92m5n4bVFxGGXAbQvAlE6foc3jHbN9BLfq08zcXCZC+xSwWeILnCSP2U1yimTagQ75+1YMWmxWarf1XFILVZARaC2U4XUuxUAAbi4uqv/z8Y9h4OoKmcWBw6yJwx856x2GdtMjsrFbz6azP7sCyHXw6KodCx7F/PWftjsiu2bfghwu7SSvMI933BDRHyC6INszlVzgUw9eQr/vMmSR/o/EsgcymwY8zxkQPCaEmhcrkI+fBgnrHxxU6hgwbsfvKNKmoFjJz1wOQ6uCWkssCvR1wJJNvnBlZYEY2Y2iJY1D9pm2QB89WJleurU6WBM3rsXt5Dk=
-# repo.furilabs.com:22 SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u2
-repo.furilabs.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBU8PvkjrCI+mtPEVYImq7Jj4hgv/57zaStBBGrkkfw2Pmx2YlVg/nASNoogPERM3SvWTLU+BJcRnuvR1T3ZjYY=
-# repo.furilabs.com:22 SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u2
-repo.furilabs.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFytZKxTLB74+kDVg5Sv8TksaSNpKL5OCscI/PQ4r237
+# repo.furios.io:22 SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u7
+repo.furios.io ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFytZKxTLB74+kDVg5Sv8TksaSNpKL5OCscI/PQ4r237
+# repo.furios.io:22 SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u7
+repo.furios.io ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2/ShuoIqfJ26fouqJDG68sZeeYKFwR/GBUxadu0bUfqbsSrG37jLXz+vRei+Qeq8u0YRfe84A7v8K+yqq5pWlNDSXype35F6CJ7ts59tKWQlK7sXUYenXGbJ1PxibXlrRLxXgV/eb+GV6c8ko2vWMXmhLYnr9glKTuSmBVf94ylJUVXFvJeDsfVU4Gh92m5n4bVFxGGXAbQvAlE6foc3jHbN9BLfq08zcXCZC+xSwWeILnCSP2U1yimTagQ75+1YMWmxWarf1XFILVZARaC2U4XUuxUAAbi4uqv/z8Y9h4OoKmcWBw6yJwx856x2GdtMjsrFbz6azP7sCyHXw6KodCx7F/PWftjsiu2bfghwu7SSvMI933BDRHyC6INszlVzgUw9eQr/vMmSR/o/EsgcymwY8zxkQPCaEmhcrkI+fBgnrHxxU6hgwbsfvKNKmoFjJz1wOQ6uCWkssCvR1wJJNvnBlZYEY2Y2iJY1D9pm2QB89WJleurU6WBM3rsXt5Dk=
+# repo.furios.io:22 SSH-2.0-OpenSSH_9.2p1 Debian-2+deb12u7
+repo.furios.io ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBBU8PvkjrCI+mtPEVYImq7Jj4hgv/57zaStBBGrkkfw2Pmx2YlVg/nASNoogPERM3SvWTLU+BJcRnuvR1T3ZjYY=
 EOF
 
 # Determine target.
@@ -64,7 +64,7 @@ find /tmp/buildd-results/ \
 	-regextype posix-egrep \
 	-regex "/tmp/buildd-results/.*\.(u?deb|tar\..*|dsc|buildinfo)$" \
 	-print0 \
-	| xargs -0 -i rsync --perms --chmod=D770,F770 --progress {} ${INTAKE_SSH_USER}@repo.furilabs.com:./${TARGET}/
+	| xargs -0 -i rsync --perms --chmod=D770,F770 --progress {} ${INTAKE_SSH_USER}@repo.furios.io:./${TARGET}/
 
 echo "Uploading .changes"
 find /tmp/buildd-results/ \
@@ -72,4 +72,4 @@ find /tmp/buildd-results/ \
 	-regextype posix-egrep \
 	-regex "/tmp/buildd-results/.*\.changes$" \
 	-print0 \
-	| xargs -0 -i rsync --perms --chmod=D770,F770 --progress {} ${INTAKE_SSH_USER}@repo.furilabs.com:./${TARGET}/
+	| xargs -0 -i rsync --perms --chmod=D770,F770 --progress {} ${INTAKE_SSH_USER}@repo.furios.io:./${TARGET}/
