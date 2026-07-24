@@ -32,6 +32,13 @@ jobs:
             dist: forky
             namespace: furilabs
 
+          # Flatpak builder
+          - arch: amd64
+            runner: ubuntu-24.04
+            template: flatpak-builder
+            dist: forky
+            namespace: furilabs
+
           # ARM64 builds
           # Forky
           - arch: arm64
@@ -47,6 +54,13 @@ jobs:
           - arch: arm64
             runner: ubuntu-24.04-arm
             template: aptly-intake
+            dist: forky
+            namespace: furilabs
+
+          # Flatpak builder
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+            template: flatpak-builder
             dist: forky
             namespace: furilabs
 

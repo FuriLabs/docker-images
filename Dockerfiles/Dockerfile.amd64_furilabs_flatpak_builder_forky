@@ -1,0 +1,52 @@
+# syntax=docker/dockerfile:experimental
+
+# Pull latest Debian forky
+ARG ARCH=
+FROM ${ARCH}/debian:forky AS builder
+
+ENV DEBIAN_FRONTEND noninteractive
+ENV DEBCONF_NOWARNINGS yes
+ENV DEBIAN_PRIORITY critical
+
+RUN apt-get update && apt-get install -y debootstrap
+
+ARG MIRROR=http://debian.furios.io/
+RUN debootstrap --arch=${ARCH} forky /rootfs $MIRROR
+
+RUN echo 'Acquire::Check-Valid-Until false;' > /rootfs/etc/apt/apt.conf.d/10custom-settings && \
+    echo 'Acquire::https::Verify-Peer false;' >> /rootfs/etc/apt/apt.conf.d/10custom-settings && \
+    echo 'Acquire::Check-Date false;' >> /rootfs/etc/apt/apt.conf.d/10custom-settings
+
+RUN chroot /rootfs apt-get update
+RUN chroot /rootfs apt-get install --yes ca-certificates adduser
+
+COPY repositories/forky/all/* /rootfs/etc/apt/sources.list.d/
+COPY repositories/forky/amd64/* /rootfs/etc/apt/sources.list.d/
+
+COPY preferences/forky/* /rootfs/etc/apt/preferences.d/
+
+COPY keyrings/all/* /rootfs/etc/apt/furilabs-gpg.d/
+COPY keyrings/amd64/* /rootfs/etc/apt/furilabs-gpg.d/
+
+COPY common/apt.conf.d/* /rootfs/etc/apt/apt.conf.d/
+
+RUN chroot /rootfs apt-get update
+
+RUN chroot /rootfs apt-get install -y --allow-downgrades \
+    flatpak \
+    flatpak-builder \
+    ostree \
+    gnupg \
+    rsync \
+    openssh-client \
+    wget \
+    releng-tools \
+    furios-apt-config \
+    furios-archive-keyring
+
+RUN chroot /rootfs rm -f /etc/apt/sources.list.d/furilabs.list /etc/apt/sources.list
+
+FROM scratch
+COPY --from=builder /rootfs /
+
+WORKDIR /
